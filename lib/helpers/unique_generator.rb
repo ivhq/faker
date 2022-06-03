@@ -8,10 +8,11 @@ module Faker
       attr_reader :marked_unique
     end
 
-    def initialize(generator, max_retries)
+    def initialize(generator, max_retries, repeteable: false)
       @generator = generator
       @max_retries = max_retries
       @previous_results = Hash.new { |hash, key| hash[key] = Set.new }
+      @repeteable = false
     end
 
     def method_missing(name, *arguments)
@@ -26,8 +27,18 @@ module Faker
         return result
       end
 
-      raise RetryLimitExceeded, "Retry limit exceeded for #{name}"
+      handle_limit_exceeded
     end
+
+    def handle_limit_exceeded
+      if @repeteable
+        clear
+        @generator.public_send(name, *arguments)
+      else
+        raise RetryLimitExceeded, "Retry limit exceeded for #{name}"
+      end
+    end
+
     # Have method_missing use ruby 2.x keywords if the method exists.
     # This is necessary because the syntax for passing arguments (`...`)
     # is invalid on versions before Ruby 2.7, so it can't be used.
@@ -41,6 +52,10 @@ module Faker
 
     def clear
       @previous_results.clear
+    end
+
+    def repeteable
+      @repeteable = true
     end
 
     def self.clear
