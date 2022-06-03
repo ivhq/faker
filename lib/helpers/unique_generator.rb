@@ -56,6 +56,7 @@ module Faker
 
     def repeteable
       @repeteable = true
+      self
     end
 
     def self.clear
