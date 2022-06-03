@@ -223,7 +223,7 @@ module Faker
       end
 
       def repeteable(max_retries = 10_000)
-        unique.repeteable
+        @unique ||= RepetableGenerator.new(self, max_retries)
       end
 
       def sample(list, num = nil)

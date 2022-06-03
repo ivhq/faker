@@ -11,8 +11,8 @@ module Faker
     def initialize(generator, max_retries, repeteable: false)
       @generator = generator
       @max_retries = max_retries
-      @previous_results = Hash.new { |hash, key| hash[key] = Set.new }
       @repeteable = false
+      @previous_results = Hash.new { |hash, key| hash[key] = Set.new }
     end
 
     def method_missing(name, *arguments)
@@ -31,12 +31,7 @@ module Faker
     end
 
     def handle_limit_exceeded
-      if @repeteable
-        clear
-        @generator.public_send(name, *arguments)
-      else
-        raise RetryLimitExceeded, "Retry limit exceeded for #{name}"
-      end
+      raise RetryLimitExceeded, "Retry limit exceeded for #{name}"
     end
 
     # Have method_missing use ruby 2.x keywords if the method exists.
@@ -52,11 +47,6 @@ module Faker
 
     def clear
       @previous_results.clear
-    end
-
-    def repeteable
-      @repeteable = true
-      self
     end
 
     def self.clear
