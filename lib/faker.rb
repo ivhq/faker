@@ -222,6 +222,10 @@ module Faker
         @unique ||= UniqueGenerator.new(self, max_retries)
       end
 
+      def repeteable(max_retries = 10_000)
+        @unique ||= RepetableGenerator.new(self, max_retries)
+      end
+
       def sample(list, num = nil)
         if list.respond_to?(:sample)
           if num
